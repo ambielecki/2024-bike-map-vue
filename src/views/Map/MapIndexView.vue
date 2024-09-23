@@ -1,10 +1,11 @@
 <script setup>
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 
 let map = {};
-let positions = {};
+const routes = ref([]);
+const polyLines = ref({});
 
 onMounted(() => {
   map = L.map('map_test').setView([42.60204, -71.10673], 12);
@@ -14,17 +15,10 @@ onMounted(() => {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
 
-  fetch('http://bike-map-api.bielecki.test/api/test')
+  fetch('http://bike-map-api.bielecki.test/api/routes?filters[]=no_lat_lng')
       .then(response => response.json())
       .then(data => {
-            positions = data?.positions;
-            let points = [];
-            for (const timestamp in positions) {
-              points.push([positions[timestamp].lat, positions[timestamp].lng]);
-            }
-
-            const polyline = L.polyline(points, {color: 'red'}).addTo(map);
-            map.fitBounds(polyline.getBounds());
+            routes.value = data?.routes
           }
       )
       .catch(error => console.log(error));
@@ -36,10 +30,48 @@ onUnmounted(() => {
   }
 });
 
+async function addToMap(route) {
+  route.added = true;
+  if (!Object.prototype.hasOwnProperty.call(route, 'lat_lng')) {
+    route = await fetchFullMapData(route.id);
+  }
+
+  const polyLineToAdd = L.polyline(route.lat_lng, {color: 'red', opacity: 0.25});
+  polyLines.value[route.id] = polyLineToAdd;
+  polyLineToAdd.addTo(map);
+}
+
+function removeFromMap(route) {
+  route.added = false;
+  map.removeLayer(polyLines.value[route.id]);
+}
+
+async function fetchFullMapData(id) {
+  const response = await fetch('http://bike-map-api.bielecki.test/api/routes/' + id);
+  const data = await response.json();
+
+  const routeWithData = data.route;
+  routeWithData.added = true;
+  routes.value = routes.value.map((route) => {
+    if (route.id === routeWithData.id) {
+      return routeWithData;
+    }
+
+    return route;
+  });
+
+  return routeWithData;
+}
+
 </script>
 
 <template>
 <div id="map_test"></div>
+<div v-for="route in routes">
+  Route Date: {{ route.date }}
+  <button v-if="!route.added" @click="addToMap(route)">Add to Map</button>
+  &nbsp<button v-if="route.added" @click="removeFromMap(route)">Remove from Map</button>
+</div>
 </template>
 
 <style scoped>
