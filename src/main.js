@@ -1,3 +1,6 @@
+import Buefy from 'buefy';
+import 'buefy/dist/buefy.css';
+
 import './assets/main.css'
 
 import { createApp } from 'vue'
@@ -10,5 +13,6 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(Buefy);
 
 app.mount('#app')

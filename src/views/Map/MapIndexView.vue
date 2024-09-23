@@ -36,7 +36,8 @@ async function addToMap(route) {
     route = await fetchFullMapData(route.id);
   }
 
-  const polyLineToAdd = L.polyline(route.lat_lng, {color: 'red', opacity: 0.25});
+  const polyLineToAdd = L.polyline(route.lat_lng, {color: 'red', opacity: 0.25})
+      .bindTooltip(route.date + ' ' + route.name);
   polyLines.value[route.id] = polyLineToAdd;
   polyLineToAdd.addTo(map);
 }
