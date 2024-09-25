@@ -18,13 +18,13 @@ const container_class = computed(() => {
 
 <template>
 <div class="main_container">
-  <TopNav />
+  <TopNav/>
   <div :class="container_class" id="router_div">
-    <RouterView />
+    <RouterView/>
   </div>
 
 </div>
-<Footer />
+<Footer/>
 </template>
 
 <style>
@@ -33,6 +33,6 @@ const container_class = computed(() => {
 }
 
 #router_div {
-  padding-top: 1rem;
+  padding-top: 5rem;
 }
 </style>

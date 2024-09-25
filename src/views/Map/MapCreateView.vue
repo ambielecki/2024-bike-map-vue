@@ -25,8 +25,8 @@ function upload() {
     },
     body: data,
   })
-      .then(response => response.json())
-      .then(data => console.log(data));
+    .then(response => response.json())
+    .then(data => console.log(data));
 }
 
 </script>

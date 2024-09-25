@@ -3,6 +3,8 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { onMounted, onUnmounted, ref } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import ColorPicker from '@mcistudio/vue-colorpicker'
+import '@mcistudio/vue-colorpicker/dist/style.css'
 
 let map = {};
 const routes = ref([]);
@@ -17,16 +19,18 @@ onMounted(() => {
   }).addTo(map);
 
   fetch('http://bike-map-api.bielecki.test/api/routes?filters[condensed]=1')
-      .then(response => response.json())
-      .then(data => {
-            routes.value = data?.routes
-            routes.value.map(route => {
-              route.color = "#e6163c"
-              return route;
-            })
+    .then(response => response.json())
+    .then(data => {
+        routes.value = data?.routes
+        routes.value.map(route => {
+          route.color = {
+            color: {r:255, g:0, b:0, a:1}
           }
-      )
-      .catch(error => console.log(error));
+          return route;
+        })
+      }
+    )
+    .catch(error => console.log(error));
 });
 
 onUnmounted(() => {
@@ -41,8 +45,8 @@ async function addToMap(route) {
     route = await fetchFullMapData(route.id);
   }
 
-  const polyLineToAdd = L.polyline(route.lat_lng, {color: route.color, opacity: 0.25})
-      .bindTooltip(route.date + ' ' + route.name);
+  const polyLineToAdd = L.polyline(route.lat_lng, {color: route.color.hex, opacity: 0.25})
+    .bindTooltip(route.date + ' ' + route.name);
   polyLines.value[route.id] = polyLineToAdd;
   polyLineToAdd.addTo(map);
 }
@@ -51,19 +55,6 @@ function addAllRoutesToMap() {
   routes.value.forEach((route) => {
     if (!route.added) {
       addToMap(route);
-    }
-  })
-}
-
-function removeFromMap(route) {
-  route.added = false;
-  map.removeLayer(polyLines.value[route.id]);
-}
-
-function removeAllRoutesFromMap() {
-  routes.value.forEach((route) => {
-    if (route.added) {
-      removeFromMap(route);
     }
   })
 }
@@ -86,6 +77,23 @@ async function fetchFullMapData(id) {
   return routeWithData;
 }
 
+function removeFromMap(route) {
+  route.added = false;
+  map.removeLayer(polyLines.value[route.id]);
+}
+
+function removeAllRoutesFromMap() {
+  routes.value.forEach((route) => {
+    if (route.added) {
+      removeFromMap(route);
+    }
+  })
+}
+
+function handleColorChange(value) {
+  console.log(value);
+}
+
 </script>
 
 <template>
@@ -99,26 +107,32 @@ async function fetchFullMapData(id) {
       <div v-for="route in routes" class="column is-full is-flex is-vcentered">
         <div class="field is-grouped">
           <p class="control">
-            <b-button type="is-success" v-if="!route.added" @click="addToMap(route)"><font-awesome-icon :icon="['fas', 'plus']" /></b-button>
-            <b-button type="is-danger" v-else @click="removeFromMap(route)"><font-awesome-icon :icon="['fas', 'minus']" /></b-button>
+            <button class="button is-primary has-text-white" v-if="!route.added" @click="addToMap(route)">
+              <font-awesome-icon :icon="['fas', 'plus']"/>
+            </button>
+            <button class="button has-background-danger-50 has-text-white" v-else @click="removeFromMap(route)">
+              <font-awesome-icon :icon="['fas', 'minus']"/>
+            </button>
           </p>
           <p class="control">
-            <b-colorpicker v-model="route.color" />
+            <ColorPicker @colorChanged="handleColorChange" v-model="route.color"></ColorPicker>
           </p>
           <p class="text-p">{{ route.name }} {{ route.date }}</p>
         </div>
       </div>
+    </div>
+  </div>
+</div>
 
-      <div class="column is-full">
-        <div class="field is-grouped">
-          <p class="control">
-            <b-button type="is-success" @click="addAllRoutesToMap">Add All</b-button>
-          </p>
-          <p class="control">
-            <b-button type="is-danger" @click="removeAllRoutesFromMap">Remove All</b-button>
-          </p>
-        </div>
-      </div>
+<div class="columns">
+  <div class="column is-full">
+    <div class="field is-grouped">
+      <p class="control">
+        <button class="button is-primary has-text-white" @click="addAllRoutesToMap">Add All</button>
+      </p>
+      <p class="control">
+        <button class="button has-background-danger-50 has-text-white" @click="removeAllRoutesFromMap">Remove All</button>
+      </p>
     </div>
   </div>
 </div>
@@ -133,9 +147,5 @@ async function fetchFullMapData(id) {
 
 .route-container {
   align-content: center;
-}
-
-.text-p {
-  padding-top: 0.4rem;
 }
 </style>

@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <main>
-    Test
-  </main>
+<main>
+  Test
+</main>
 </template>
