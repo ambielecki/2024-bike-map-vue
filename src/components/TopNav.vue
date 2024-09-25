@@ -35,8 +35,8 @@ onMounted(() => {
 
   <div id="navbar" class="navbar-menu">
     <div class="navbar-start">
-      <router-link :to="{ name: 'map' }" class="navbar-item" data-test="map">Upload</router-link>
-      <router-link :to="{ name: 'map_create' }" class="navbar-item" data-test="map_create">Map</router-link>
+      <router-link :to="{ name: 'map_create' }" class="navbar-item" data-test="map_create">Upload</router-link>
+      <router-link :to="{ name: 'map' }" class="navbar-item" data-test="map">Map</router-link>
     </div>
 
     <div class="navbar-end">
