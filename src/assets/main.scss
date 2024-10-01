@@ -2,6 +2,16 @@ $bike_primary: #009933;
 
 @use "bulma/sass" with ($primary: $bike_primary);
 
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
 #main_nav {
   z-index: 10000;
 }

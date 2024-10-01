@@ -91,7 +91,7 @@ function removeAllRoutesFromMap() {
 }
 
 function handleColorChange(value) {
-  console.log(value);
+
 }
 
 </script>

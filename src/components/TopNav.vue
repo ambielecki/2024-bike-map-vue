@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+
+import { useAlertStore } from "@/stores/alert";
+import { useUserStore } from "@/stores/user";
+
+import AuthProvider from "../providers/AuthProvider";
+
+const userStore = useUserStore();
+const is_loading = ref(false);
 
 onMounted(() => {
   const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
@@ -19,6 +27,19 @@ onMounted(() => {
     });
   });
 });
+
+async function logOut() {
+  is_loading.value = true;
+  if (userStore.getMillisecondsUntilExpiration() > 0) {
+    await AuthProvider.logOut();
+  }
+
+  userStore.logOut();
+
+  is_loading.value = false;
+
+  useAlertStore().addAlert('Successfully Logged Out.')
+}
 </script>
 
 <template>
@@ -58,11 +79,11 @@ onMounted(() => {
 <!--          </p>-->
 <!--        </div>-->
 <!---->
-<!--        <div v-else class="buttons">-->
-<!--          <button @click="logOut" class="button is-info is-light" :class="{ 'is-loading': is_loading }" data-test="log_out">-->
-<!--            <strong>Log Out</strong>-->
-<!--          </button>-->
-<!--        </div>-->
+        <div v-if="userStore.is_logged_in" class="buttons">
+          <button @click="logOut" class="button is-primary" :class="{ 'is-loading': is_loading }" data-test="log_out">
+            <strong>Log Out</strong>
+          </button>
+        </div>
       </div>
     </div>
   </div>
