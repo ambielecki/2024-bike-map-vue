@@ -5,6 +5,7 @@ import { onMounted, onUnmounted, ref } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import ColorPicker from '@mcistudio/vue-colorpicker'
 import '@mcistudio/vue-colorpicker/dist/style.css'
+import RouteProvider from "@/providers/RouteProvider.js";
 
 let map = {};
 const routes = ref([]);
@@ -18,19 +19,20 @@ onMounted(() => {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
 
-  fetch('http://bike-map-api.bielecki.test/api/routes?filters[condensed]=1')
-    .then(response => response.json())
-    .then(data => {
-        routes.value = data?.routes
+  RouteProvider.getRoutes({
+    'filters[condensed]': 1
+  })
+    .then(routesData => {
+      if (routesData) {
+        routes.value = routesData;
         routes.value.map(route => {
           route.color = {
             color: {r:255, g:0, b:0, a:1}
           }
           return route;
-        })
+        });
       }
-    )
-    .catch(error => console.log(error));
+    });
 });
 
 onUnmounted(() => {
@@ -60,21 +62,21 @@ function addAllRoutesToMap() {
 }
 
 async function fetchFullMapData(id) {
-  const response = await fetch('http://bike-map-api.bielecki.test/api/routes/' + id);
-  const data = await response.json();
+  const routeWithData = await RouteProvider.getRoute(id);
 
-  const routeWithData = data.route;
-  routeWithData.added = true;
-  routes.value = routes.value.map((route) => {
-    if (route.id === routeWithData.id) {
-      routeWithData.color = route.color;
-      return routeWithData;
-    }
+  if (routeWithData) {
+    routeWithData.added = true;
+    routes.value = routes.value.map((route) => {
+      if (route.id === routeWithData.id) {
+        routeWithData.color = route.color;
+        return routeWithData;
+      }
 
-    return route;
-  });
+      return route;
+    });
 
-  return routeWithData;
+    return routeWithData;
+  }
 }
 
 function removeFromMap(route) {
