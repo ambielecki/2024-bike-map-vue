@@ -7,22 +7,12 @@ export const useAlertStore = defineStore('alert', () => {
     const warning = 'is-warning';
     const danger = 'is-danger';
 
-    function removeExpiredAlerts() {
-        alerts.value = alerts.value.filter((alert) => {
-            return alert.time > 0;
-        });
-    }
-
-    function decrementMessageTimes() {
-        alerts.value.map((alert) => {
-            alert.time--;
-
-            return alert;
-        });
-    }
-
     function removeAlert(key) {
         alerts.value.splice(key, 1);
+    }
+
+    function removeAllAlerts() {
+        alerts.value = [];
     }
 
     function addAlert(message = '', type = success, time = 5) {
@@ -42,5 +32,5 @@ export const useAlertStore = defineStore('alert', () => {
         });
     }
 
-    return { alerts, removeExpiredAlerts, removeAlert, addAlert, decrementMessageTimes, addValidationAlert, success, warning, danger };
+    return { alerts, removeAlert, removeAllAlerts, addAlert, addValidationAlert, success, warning, danger };
 });

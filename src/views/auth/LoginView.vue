@@ -2,10 +2,10 @@
 import { useUserStore } from "@/stores/user";
 import { useAlertStore } from "@/stores/alert";
 import { ref, computed } from 'vue';
-import AuthProvider from "../../providers/AuthProvider";
 import validationProvider from "../../providers/ValidationProvider";
 import router from "../../router";
 import TextInput from "@/components/Inputs/TextInput.vue";
+import { useHasErrors } from "@/composables/hasErrors.js";
 
 const userStore = useUserStore();
 const password = ref('');
@@ -16,16 +16,8 @@ const errors = ref({
 });
 
 const has_errors = computed(() => {
-  let return_value = false;
-  for (const field in errors.value) {
-    if (errors.value[field].length > 0) {
-      return_value = true;
-      break;
-    }
-  }
-
-  return return_value;
-})
+  return useHasErrors(errors);
+});
 
 const hide_login = ref(userStore.is_logged_in);
 const is_loading = ref(false);

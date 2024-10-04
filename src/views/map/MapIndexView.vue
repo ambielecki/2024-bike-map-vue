@@ -10,6 +10,9 @@ import RouteProvider from "@/providers/RouteProvider.js";
 let map = {};
 const routes = ref([]);
 const polyLines = ref({});
+const all_color = ref({
+  color: {r:255, g:0, b:0, a:1}
+});
 
 onMounted(() => {
   map = L.map('map').setView([42.60204, -71.10673], 12);
@@ -92,8 +95,11 @@ function removeAllRoutesFromMap() {
   })
 }
 
-function handleColorChange(value) {
-
+function handleColorChange(route) {
+  if (route.added) {
+    removeFromMap(route);
+    addToMap(route);
+  }
 }
 
 </script>
@@ -105,20 +111,20 @@ function handleColorChange(value) {
   </div>
 
   <div class="column is-full is-4-tablet">
-    <div class="columns is-multiline is-flex route-container">
-      <div v-for="route in routes" class="column is-full is-flex is-vcentered">
+    <div class="columns is-multiline route-container">
+      <div v-for="route in routes" class="column is-full is-vcentered">
         <div class="field is-grouped">
-          <p class="control">
+          <div class="control">
             <button class="button is-primary has-text-white" v-if="!route.added" @click="addToMap(route)">
               <font-awesome-icon :icon="['fas', 'plus']"/>
             </button>
             <button class="button has-background-danger-50 has-text-white" v-else @click="removeFromMap(route)">
               <font-awesome-icon :icon="['fas', 'minus']"/>
             </button>
-          </p>
-          <p class="control">
-            <ColorPicker @colorChanged="handleColorChange" v-model="route.color"></ColorPicker>
-          </p>
+          </div>
+          <div class="control">
+            <ColorPicker @colorChanged="handleColorChange(route)" v-model="route.color"></ColorPicker>
+          </div>
           <p class="text-p">{{ route.name }} {{ route.date }}</p>
         </div>
       </div>

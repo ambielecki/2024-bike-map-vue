@@ -2,6 +2,10 @@ $bike_primary: #009933;
 
 @use "bulma/sass" with ($primary: $bike_primary);
 
+.main_container {
+  margin: 0.5rem;
+}
+
 .v-enter-active,
 .v-leave-active {
   transition: opacity 0.5s ease;
