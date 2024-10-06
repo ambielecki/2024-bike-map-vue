@@ -11,7 +11,7 @@ let map = {};
 const routes = ref([]);
 const polyLines = ref({});
 const all_color = ref({
-  color: {r:255, g:0, b:0, a:1}
+  color: {r: 255, g: 0, b: 0, a: 1}
 });
 
 onMounted(() => {
@@ -30,7 +30,7 @@ onMounted(() => {
         routes.value = routesData;
         routes.value.map(route => {
           route.color = {
-            color: {r:255, g:0, b:0, a:1}
+            color: {r: 255, g: 0, b: 0, a: 1}
           }
           return route;
         });
@@ -108,11 +108,22 @@ function handleColorChange(route) {
 <div class="columns">
   <div class="column is-full is-8-tablet">
     <div id="map"></div>
+    <br>
+    <div class="field is-grouped">
+      <p class="control">
+        <button class="button is-primary has-text-white" @click="addAllRoutesToMap">Add All</button>
+      </p>
+      <p class="control">
+        <button class="button has-background-danger-50 has-text-white" @click="removeAllRoutesFromMap">Remove All</button>
+      </p>
+    </div>
   </div>
 
-  <div class="column is-full is-4-tablet">
-    <div class="columns is-multiline route-container">
-      <div v-for="route in routes" class="column is-full is-vcentered">
+  <div id="scroll_container" class="column is-full is-4-tablet">
+    <div class="columns route-container is-multiline">
+      <div v-for="route in routes" class="column is-full">
+        <p class="text-p"><b>Name: </b>{{ route.name }}</p>
+        <p class="text-p"><b>Date: </b>{{ route.date }}</p>
         <div class="field is-grouped">
           <div class="control">
             <button class="button is-primary has-text-white" v-if="!route.added" @click="addToMap(route)">
@@ -122,25 +133,12 @@ function handleColorChange(route) {
               <font-awesome-icon :icon="['fas', 'minus']"/>
             </button>
           </div>
+
           <div class="control">
             <ColorPicker @colorChanged="handleColorChange(route)" v-model="route.color"></ColorPicker>
           </div>
-          <p class="text-p">{{ route.name }} {{ route.date }}</p>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<div class="columns">
-  <div class="column is-full">
-    <div class="field is-grouped">
-      <p class="control">
-        <button class="button is-primary has-text-white" @click="addAllRoutesToMap">Add All</button>
-      </p>
-      <p class="control">
-        <button class="button has-background-danger-50 has-text-white" @click="removeAllRoutesFromMap">Remove All</button>
-      </p>
     </div>
   </div>
 </div>
@@ -155,5 +153,12 @@ function handleColorChange(route) {
 
 .route-container {
   align-content: center;
+}
+
+#scroll_container {
+  @media screen and (min-width: 768px) {
+    height: 90vh;
+    overflow-y: auto;
+  }
 }
 </style>

@@ -56,8 +56,10 @@ async function logOut() {
 
   <div id="navbar" class="navbar-menu">
     <div class="navbar-start">
-      <router-link :to="{ name: 'map_create' }" class="navbar-item" data-test="map_create">Upload</router-link>
       <router-link :to="{ name: 'map' }" class="navbar-item" data-test="map">Map</router-link>
+      <Transition>
+        <router-link v-if="userStore.is_logged_in" :to="{ name: 'map_create' }" class="navbar-item" data-test="map_create">Upload</router-link>
+      </Transition>
     </div>
 
     <div class="navbar-end">
@@ -79,11 +81,13 @@ async function logOut() {
 <!--          </p>-->
 <!--        </div>-->
 <!---->
-        <div v-if="userStore.is_logged_in" class="buttons">
-          <button @click="logOut" class="button is-primary" :class="{ 'is-loading': is_loading }" data-test="log_out">
-            <strong>Log Out</strong>
-          </button>
-        </div>
+        <Transition>
+          <div v-if="userStore.is_logged_in" class="buttons">
+            <button @click="logOut" class="button is-primary" :class="{ 'is-loading': is_loading }" data-test="log_out">
+              <strong>Log Out</strong>
+            </button>
+          </div>
+        </Transition>
       </div>
     </div>
   </div>

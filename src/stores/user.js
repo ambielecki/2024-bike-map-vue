@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import router from "@/router";
 import UserProvider from "@/providers/UserProvider.js";
 import AuthProvider from "@/providers/AuthProvider.js";
+import userProvider from "@/providers/UserProvider.js";
 
 export const useUserStore = defineStore('user', () => {
     const user = ref({});
@@ -70,6 +71,41 @@ export const useUserStore = defineStore('user', () => {
         return false;
     }
 
+    async function refreshToken() {
+        const token_response = await AuthProvider.getRefresh();
+
+        if (token_response) {
+            setToken(token_response.access_token, token_response.expires_in);
+        }
+
+        return false;
+    }
+
+    function checkCachedToken() {
+        const local_access_token = window.localStorage.getItem('access_token');
+        const local_expires_at = window.localStorage.getItem('expires_at');
+        if (!local_access_token || !local_expires_at) {
+            return false;
+        }
+
+        const time = new Date().getTime();
+        if (time < local_expires_at) {
+            access_token.value = local_access_token;
+            expires_at.value = parseInt(local_expires_at);
+            is_logged_in.value = true;
+            has_checked_session.value = true;
+
+            userProvider.getUser()
+                .then(userData => {
+                    user.value = userData;
+                });
+
+            return true;
+        }
+
+        return false;
+    }
+
     function reset() {
         user.value = {};
         access_token.value = '';
@@ -88,6 +124,8 @@ export const useUserStore = defineStore('user', () => {
         reset,
         logIn,
         logOut,
+        refreshToken,
+        checkCachedToken,
         getIsAdmin,
     };
 });

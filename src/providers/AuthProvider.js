@@ -15,6 +15,16 @@ class AuthProvider {
         return false;
     }
 
+    async getRefresh() {
+        const data = await useFetchPost(this.base_api + '/refresh', {}, true);
+
+        if (data) {
+            return data;
+        }
+
+        return false;
+    }
+
     async logOut() {
         useFetchPost(this.base_api + '/logout',{}, true)
     }

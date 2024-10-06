@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import MapIndexView from "@/views/map/MapIndexView.vue";
 import MapCreateView from "@/views/map/MapCreateView.vue";
 import LoginView from "@/views/auth/LoginView.vue";
+import { useUserStore } from "@/stores/user.js";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,7 +21,12 @@ const router = createRouter({
         {
             path: '/map/create',
             name: 'map_create',
-            component: MapCreateView
+            component: MapCreateView,
+            beforeEnter: (to, from) => {
+                if (!useUserStore().is_logged_in && !useUserStore().checkCachedToken()) {
+                    return false;
+                }
+            }
         },
         {
             path: '/login',

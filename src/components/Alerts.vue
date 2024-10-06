@@ -1,6 +1,15 @@
 <script setup>
   import { useAlertStore } from "../stores/alert";
-  import { computed} from "vue";
+  import { computed, onMounted } from "vue";
+
+  onMounted(() => {
+    setInterval(() => {
+      if (useAlertStore().alerts.length > 0) {
+        useAlertStore().decrementMessageTimes();
+        useAlertStore().removeExpiredAlerts();
+      }
+    }, 1000);
+  });
 
   const show_clear = computed(() => {
     return useAlertStore().alerts.length > 1;
@@ -10,7 +19,9 @@
 <template>
 <div class="alert_container">
   <div v-if="show_clear" id="clear_button_container">
-    <button @click="useAlertStore().removeAllAlerts()" id="clear_button" class="button is-primary has-text-white is-small">Clear All</button>
+    <button @click="useAlertStore().removeAllAlerts()" id="clear_button" class="button is-dark has-text-white is-small">
+      Clear All<span @click="useAlertStore().removeAllAlerts()" id="clear_all_x" class="delete"></span>
+    </button>
   </div>
   <TransitionGroup>
     <div
@@ -57,5 +68,9 @@
 
 #clear_button {
   margin-bottom: 0.5rem;
+}
+
+#clear_all_x {
+  margin-left: 0.5rem;
 }
 </style>

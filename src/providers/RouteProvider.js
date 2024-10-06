@@ -26,10 +26,13 @@ class RouteProvider {
         return false;
     }
 
-    async postRoute(name, file) {
+    async postRoute(name, file, description = null) {
         let body = new FormData();
         body.append('name', name);
         body.append('file', file);
+        if (description) {
+            body.append('description', description);
+        }
 
         const data = await useFetchPostUploadFile(this.base_api + '/routes', body, true);
 

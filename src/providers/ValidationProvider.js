@@ -16,7 +16,7 @@ class ValidationProvider {
     }
 
     validateNotNull(test) {
-        return test !== null;
+        return test !== undefined && test !== null;
     }
 
     validateNotBlank(test) {
